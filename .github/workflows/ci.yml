@@ -1,35 +1,56 @@
-name: CI - Generate & Run NUnit Tests
+name: Comparative Test Report
 
 on:
-  push:
-    branches: [ main, ai-version-1, ai-version-2, ai-version-3 ]
   workflow_dispatch:
 
 jobs:
-  test-generation:
+  test-v1:
+    name: Test AI DeepSeek
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+        with:
+          ref: ai-version-1
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
-      - name: Install PyYAML
-        run: pip install pyyaml
-
-      - name: Run Generator
-        run: python generator/gen_tests.py --config config.yaml
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - run: pip install pyyaml
+      - run: python generator/gen_tests.py --config config.yaml
+      - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
+      - run: dotnet test
 
-      - name: Build and Test
-        run: |
-          dotnet restore
-          dotnet build --no-restore
-          dotnet test --no-build --verbosity normal
+  test-v2:
+    name: Test AI GigaChat
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ai-version-2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pyyaml
+      - run: python generator/gen_tests.py --config config.yaml
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - run: dotnet test
+
+  test-v3:
+    name: Test AI Qwen
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ai-version-3
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pyyaml
+      - run: python generator/gen_tests.py --config config.yaml
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - run: dotnet test
