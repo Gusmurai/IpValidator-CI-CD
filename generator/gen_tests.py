@@ -34,7 +34,7 @@ namespace Tests
 }}
 """
 
-TEST_METHOD_TEMPLATE = """
+TEST_METHOD_TEMPLATE = """#nullable disable
         [Test]
         [Description("Класс эквивалентности: {case_desc}")]
         {test_cases}
