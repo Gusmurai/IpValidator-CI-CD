@@ -38,7 +38,7 @@ TEST_METHOD_TEMPLATE = """#nullable disable
         [Test]
         [Description("Класс эквивалентности: {case_desc}")]
         {test_cases}
-        public void Test_{method_name}_{case_name}(string? input)
+        public void Test_{method_name}_{case_name}(string input)
         {{
             // === Arrange ===
             // Предусловие: {pre}
