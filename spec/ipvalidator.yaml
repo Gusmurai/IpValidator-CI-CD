@@ -1,0 +1,42 @@
+module: IpAddressValidator
+
+non_functional_requirements:
+  - id: NFR-1
+    desc: "Ведущие нули в октетах не допускаются (для исключения неоднозначности)"
+  - id: NFR-2
+    desc: "Генерация исключения при передаче null в методы преобразования"
+
+methods:
+  - name: IsValidIPv4
+    req_functional: ["1"]
+    req_non_functional: ["NFR-1"]
+    signature: "bool IsValidIPv4(string ip)"
+    pre: "ip != null"
+    post: "Возвращает true, если строка является корректным IPv4, иначе false"
+    equivalence_classes:
+      - case: "Валидный IP"
+        inputs: ['"127.0.0.1"']
+        expected: "true"
+      - case: "Мало октетов"
+        inputs: ['"192.168.1"']
+        expected: "false"
+      - case: "Ведущие нули"
+        inputs: ['"192.168.01.1"']
+        expected: "false"
+      - case: "Пустая строка"
+        inputs: ['""']
+        expected: "false"
+
+  - name: GetOctets
+    req_functional: ["2"]
+    req_non_functional: ["NFR-2"]
+    signature: "byte[] GetOctets(string ip)"
+    pre: "IsValidIPv4(ip) == true"
+    post: "Возвращает массив байт длины 4"
+    equivalence_classes:
+      - case: "Корректное преобразование"
+        inputs: ['"192.168.0.1"']
+        expected: "new byte[] { 192, 168, 0, 1 }"
+      - case: "Null (исключение)"
+        inputs: ["null"]
+        expected: "ArgumentException"
