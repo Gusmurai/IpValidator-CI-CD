@@ -1,77 +1,42 @@
-name: Comparative Test Report
+name: CI - Generate & Run NUnit Tests
 
 on:
+  push:
+    branches: [ main, ai-version-1, ai-version-2, ai-version-3 ]
   workflow_dispatch:
 
 jobs:
-  test-v1:
-    name: Test AI DeepSeek
+  test-generation:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ai-version-1
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - run: pip install pyyaml
-      - run: python generator/gen_tests.py --config config.yaml
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '9.0.x'
-      - run: dotnet test --logger "trx" # создание файла отчета
-      
-      - name: Upload DeepSeek results
-        uses: actions/upload-artifact@v4
-        if: always() # Загружать даже если тесты упали
-        with:
-          name: nunit-results-deepseek
-          path: '**/*.trx'
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  test-v2:
-    name: Test AI GigaChat
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ai-version-2
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install pyyaml
-      - run: python generator/gen_tests.py --config config.yaml
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '9.0.x'
-      - run: dotnet test --logger "trx"
-      
-      - name: Upload GigaChat results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: nunit-results-gigachat
-          path: '**/*.trx'
 
-  test-v3:
-    name: Test AI Qwen
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ai-version-3
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - run: pip install pyyaml
-      - run: python generator/gen_tests.py --config config.yaml
-      - uses: actions/setup-dotnet@v4
+      - name: Install PyYAML
+        run: pip install pyyaml
+
+      - name: Run Generator
+        run: python generator/gen_tests.py --config config.yaml
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
-      - run: dotnet test --logger "trx"
-      
-      - name: Upload Qwen results
+
+      - name: Build and Test
+        run: |
+          dotnet restore
+          dotnet build --no-restore
+          dotnet test --no-build --verbosity normal --logger "trx"
+
+      - name: Upload test results
         uses: actions/upload-artifact@v4
-        if: always()
+        if: always() # Загружать артефакт даже если тесты не прошли
         with:
-          name: nunit-results-qwen
+          name: nunit-test-results
           path: '**/*.trx'
