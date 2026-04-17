@@ -38,7 +38,7 @@ TEST_METHOD_TEMPLATE = """
         [Test]
         [Description("Класс эквивалентности: {case_desc}")]
         {test_cases}
-        public void Test_{method_name}_{case_name}()
+        public void Test_{method_name}_{case_name}(string input)
         {{
             // === Arrange ===
             // Предусловие: {pre}
@@ -72,9 +72,9 @@ def generate_method_tests(method_data: Dict[str, Any]) -> List[str]:
         
         method_name = method_data["name"]
         if method_data["signature"].startswith("void"):
-            act_code = f"_sut.{method_name}({inputs_str});"
+            act_code = f"_sut.{method_name}(input);"
         else:
-            act_code = f"var result = _sut.{method_name}({inputs_str});"
+            act_code = f"var result = _sut.{method_name}(input);"
             
         assert_code = 'Assert.Pass("Автосгенерированный тест пройден. Здесь должна быть проверка (Assert).");'
         
