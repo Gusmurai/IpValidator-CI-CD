@@ -19,7 +19,14 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
-      - run: dotnet test
+      - run: dotnet test --logger "trx" # создание файла отчета
+      
+      - name: Upload DeepSeek results
+        uses: actions/upload-artifact@v4
+        if: always() # Загружать даже если тесты упали
+        with:
+          name: nunit-results-deepseek
+          path: '**/*.trx'
 
   test-v2:
     name: Test AI GigaChat
@@ -36,7 +43,14 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
-      - run: dotnet test
+      - run: dotnet test --logger "trx"
+      
+      - name: Upload GigaChat results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nunit-results-gigachat
+          path: '**/*.trx'
 
   test-v3:
     name: Test AI Qwen
@@ -53,4 +67,11 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
-      - run: dotnet test
+      - run: dotnet test --logger "trx"
+      
+      - name: Upload Qwen results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nunit-results-qwen
+          path: '**/*.trx'
