@@ -5,7 +5,7 @@ on:
 
 jobs:
   test-v1:
-    name: Test AI Version 1
+    name: Test AI DeepSeek
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -17,7 +17,7 @@ jobs:
       - run: dotnet test
 
   test-v2:
-    name: Test AI Version 2
+    name: Test AI GigaChat
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -29,7 +29,7 @@ jobs:
       - run: dotnet test
 
   test-v3:
-    name: Test AI Version 3
+    name: Test AI Qwen
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

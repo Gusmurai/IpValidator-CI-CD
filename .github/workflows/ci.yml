@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 name: .NET CI
 
 on:
@@ -29,3 +30,49 @@ jobs:
 
       - name: Test
         run: dotnet test --no-build --verbosity normal
+=======
+name: CI - Generate & Run NUnit Tests
+
+on:
+  push:
+    branches: [ "main", "ai-version-1", "ai-version-2", "ai-version-3" ]
+  workflow_dispatch:
+
+jobs:
+  test-generation-and-execution:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Generate NUnit tests
+        run: python generator/gen_tests.py --config config.yaml
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore & Build
+        run: |
+          dotnet restore
+          dotnet build --no-restore
+
+      - name: Run Tests
+        run: dotnet test --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nunit-test-results-${{ github.ref_name }}
+          path: '**/*.trx'
+>>>>>>> main
